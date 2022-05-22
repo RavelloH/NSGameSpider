@@ -38,6 +38,6 @@ for i in pic_info:
     print(links+"\n"+name)
     download(links,out='./img/'+name+'.jpg')
         
- for file_name in os.listdir('./img/'):
-     if '(1)' in file_name:
-         os.remove('./img/' + file_name)
+for file_name in os.listdir('./img/'):
+    if '(1)' in file_name:
+        os.remove('./img/' + file_name)
