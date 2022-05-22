@@ -17,27 +17,30 @@ html = urlopen("https://"+link)
 obj = bs(html.read(),'html.parser')
 pic_info = obj.find_all('img',class_="product-image-photo mplazyload mplazyload-transparent")  
 print(pic_info)
-for i in pic_info:
-    pic = str(i['data-src'])
-    name = str(i['alt'])
-    if "http" not in pic:
-        if "data" in pic:
-            continue
-        else:
-            if "//" in pic:
-                links = "http:"+pic
+try:
+    
+    for i in pic_info:
+        pic = str(i['data-src'])
+        name = str(i['alt'])
+        if "http" not in pic:
+            if "data" in pic:
+                continue
             else:
-                if pic[0] == "/":
-                    links = "http://"+link+pic
+                if "//" in pic:
+                    links = "http:"+pic
                 else:
-                    links = "http://"+link+"/"+pic
-        
-    else:
-        links = pic    
-    # 下载
-    print(links+"\n"+name)
-    download(links,out='./img/'+name+'.jpg')
-        
+                    if pic[0] == "/":
+                        links = "http://"+link+pic
+                    else:
+                        links = "http://"+link+"/"+pic
+            
+        else:
+            links = pic    
+        # 下载
+        print(links+"\n"+name)
+        download(links,out='./img/'+name+'.jpg')
+except:
+    pass
 for file_name in os.listdir('./img/'):
     if '(1)' in file_name:
         os.remove('./img/' + file_name)
