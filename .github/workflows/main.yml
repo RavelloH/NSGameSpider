@@ -34,6 +34,7 @@ jobs:
 
       - name: Commit files
         run: |
+          tree -a
           git diff
           git config --local user.email "dr_hamilton@foxmail.com"
           git config --local user.name "Ravello-H"
