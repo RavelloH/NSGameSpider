@@ -1,47 +1,45 @@
 name: update
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   schedule:
-    - cron: '30 5/12 * * *' #每日更新
+    - cron: '30 5/12 * * *'
   watch:
     types: [started]
   workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nsgamespider-update
+  cancel-in-progress: false
+
 jobs:
   build:
-    runs-on: ubuntu-latest #运行环境
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - name: 'Git set'
-        run: |
-             git init
-             git pull
-      - name: 'Set up Python'
-        uses: actions/setup-python@v4
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
         with:
-           python-version: 3.12.8 #v3
-      - name: 'Install requirements'
-        run: |
-             pip install wget
-             pip install bs4
-             pip install urllib3 #安装依赖
-      - name: 'Working'
-        run: 
-          python main.py #运行主程序
-      - name: Record time  
-        run: echo `date` > date.log
-
+          python-version: '3.12'
+      - name: Install requirements
+        run: python -m pip install wget beautifulsoup4 urllib3
+      - name: Working
+        run: python main.py
+      - name: Record time
+        run: date -u > date.log
       - name: Commit files
         run: |
-          tree -a
-          git diff
           git config --local user.email "dr_hamilton@foxmail.com"
           git config --local user.name "Ravello-H"
           git add -A
-          git commit -m "`date '+%Y-%m-%d %H:%M:%S'`" || exit #动态提交信息
-          git status
-          git push -f
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-     
+          if git diff --cached --quiet; then
+            echo "No files changed."
+          else
+            git commit -m "$(date -u '+%Y-%m-%d %H:%M:%S')"
+            git push origin HEAD:main
+          fi
